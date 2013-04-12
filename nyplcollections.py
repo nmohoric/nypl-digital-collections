@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import requests
+import xmltodict
 
 class NYPLsearch():
   def __init__(self,token=None):
@@ -12,7 +13,6 @@ class NYPLsearch():
         print "You will need to use your Authenticaton Token.\n This can be retrieved at http://api.repo.nypl.org/sign_up"
 
     self.base = "http://api.repo.nypl.org/api/v1/items"
-
 
   # Return the captures for a given uuid 
   # optional value withTitles=yes
@@ -43,4 +43,7 @@ class NYPLsearch():
   def _get(self, url, params=None):
     headers = { "Authorization" : "Token token=" + self.token }
     return requests.get(url, params=params, headers=headers)
+
+  def to_dict(self, r, format='json'):
+    return r.json() if format == 'json' else xmltodict.parse(r.text)
 
