@@ -45,7 +45,7 @@ class NYPLsearch():
 
   # Generic get which handles call to api and setting of results
   # Return: results dict
-  def _get(self, url, params=None):
+  def _get(self, url, params={}):
     headers = { "Authorization" : "Token token=" + self.token }
     params['page'] = self.page
     params['per_page'] = self.per_page
