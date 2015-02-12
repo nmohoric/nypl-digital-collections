@@ -3,14 +3,13 @@
 import requests
 import xmltodict
 
-class NYPLsearch():
-  def __init__(self,token=None, format='json', page=1, per_page=10):
-    try:
-      assert token
-    except AssertionError:
-        print "You will need to use your Authenticaton Token.\n This can be retrieved at http://api.repo.nypl.org/sign_up"
-    
 
+class NYPLsearch(object):
+    raw_results = None
+    results = None
+    error = None
+
+    def __init__(self, token, format='json', page=1, per_page=10):
         self.token = token
         self.page = page
         self.per_page = per_page
@@ -43,6 +42,8 @@ class NYPLsearch():
     # Generic get which handles call to api and setting of results
     # Return: results dict
     def _get(self, url, params=None):
+        self.raw_results = self.results = None
+
         headers = {"Authorization": "Token token=" + self.token}
         params = params or dict()
         params['page'] = self.page
