@@ -1,6 +1,4 @@
-from distutils.core import setup
-
-files = ["nyplcollections.py"]
+from setuptools import setup
 
 setup(
     name="nyplcollections",
@@ -8,8 +6,10 @@ setup(
     description = "new york public library image collections api",
     author = "nick mohoric",
     author_email = "nick.mohoric@gmail.com",
-    package_data = {'package' : files },
-    install_requires=["xmltodict"],
+    install_requires=[
+        "xmltodict",
+        "requests"
+    ],
     packages = ['nyplcollections'],
     long_description = """Really long text here.""" 
 ) 
