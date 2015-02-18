@@ -1,14 +1,10 @@
 #!/usr/bin/env python
-
 import requests
 
 class NYPLsearch(object):
-    raw_results = ''
-    request = dict()
-    error = None
 
     def __init__(self, token, page=None, per_page=None):
-        self.token = token
+        self._token = token
         self.format = 'json'
         self.page = page or 1
         self.per_page = per_page or 10
@@ -47,9 +43,7 @@ class NYPLsearch(object):
         Return: Results object"""
         url = '/'.join((self.base,) + components)
 
-        self.raw_results = self.results = None
-
-        headers = {"Authorization": "Token token=" + self.token}
+        headers = {"Authorization": "Token token=" + self._token}
 
         params['page'] = params.get('page') or self.page
         params['per_page'] = params.get('per_page') or self.per_page
@@ -58,18 +52,55 @@ class NYPLsearch(object):
                          params=params,
                          headers=headers)
 
-        self.raw_results = r.text
+        _next = self._nextify(components, picker, params)
 
-        self.headers = results['headers']
-        self.request = r.json()['nyplAPI'].get('request', dict())
-        results = r.json()['nyplAPI']['response']
+        return Result(r, picker, _next)
 
-        if self.headers['status'] == 'error':
-            self.error = {
-                'code': self.headers['code'],
-                'message': self.headers['message']
-            }
+    def _nextify(self, components, picker, params):
+        params['page'] = 1 + params.get('page', 0)
+        return lambda: self._get(components, picker, **params)
+
+
+class Result(object):
+
+    '''Iterable wrapper for responses from NYPL API'''
+    error = None
+
+    def __init__(self, request_object, picker, _next):
+        self.raw = request_object.text
+        self.status_code = request_object.status_code
+
+        self._next = _next
+
+        response = request_object.json().get('nyplAPI', {})
+
+        try:
+            self.headers = response['response'].get('headers')
+
+            if self.headers['status'] == 'error':
+                self.error = {
+                    'code': self.headers['code'],
+                    'message': self.headers['message']
+                }
+
+            else:
+                self.request = response.get('request', {})
+
+                for k in ('numResults', 'totalPages', 'perPage', 'page'):
+                    v = self.request.get(k)
+                    if v:
+                        self.request[k] = int(v)
+
+                if response['response'].get('numResults'):
+                    self.count = int(response['response']['numResults'])
+
+                self.results = picker(response['response'])
+
+        except IndexError:
+            raise IndexError("Couldn't parse response.")
+
+    def next(self):
+        if self.request.get('totalPages') > self.request.get('page'):
+            return self._next()
         else:
-            self.error = None
-
-
+            raise StopIteration
