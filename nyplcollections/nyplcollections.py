@@ -16,32 +16,32 @@ class NYPLsearch(object):
         self.format = format
         self.base = "http://api.repo.nypl.org/api/v1/items"
 
-    # Return the captures for a given uuid
-    # optional value withTitles=yes
     def captures(self, uuid, withTitles=False):
+        """Return the captures for a given uuid
+            optional value withTitles=yes"""
         return self._get('/'.join([self.base, uuid]),
                          {'withTitles': 'yes' if withTitles else 'no'})
 
-    # Return the item-uuid for a identifier.
     def uuid(self, type, val):
+        """Return the item-uuid for a identifier"""
         return self._get('/'.join([self.base, type, val]))
 
-    # Search across all (without field) or in specific field
-    # (valid fields at http://www.loc.gov/standards/mods/mods-outline.html)
     def search(self, q, field=None):
+        """Search across all (without field) or in specific field
+        (valid fields at http://www.loc.gov/standards/mods/mods-outline.html)"""
         params = {'q': q}
         if field:
             params['field'] = field
 
         return self._get('/'.join([self.base, 'search']), params)
 
-    # Return a mods record for a given uuid
     def mods(self, uuid):
+        """Return a mods record for a given uuid"""
         return self._get('/'.join([self.base, 'mods', uuid]))
 
-    # Generic get which handles call to api and setting of results
-    # Return: results dict
     def _get(self, url, params=None):
+        """Generic get which handles call to api and setting of results
+        Return: Results object"""
         self.raw_results = self.results = None
 
         headers = {"Authorization": "Token token=" + self.token}
