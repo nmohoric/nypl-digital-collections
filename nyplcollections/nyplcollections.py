@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import requests
 
+
 class NYPLsearch(object):
 
     def __init__(self, token, page=None, per_page=None):
