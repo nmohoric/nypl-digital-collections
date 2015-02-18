@@ -7,7 +7,6 @@ setup(
     author="nick mohoric",
     author_email="nick.mohoric@gmail.com",
     install_requires=[
-        "xmltodict",
         "requests"
     ],
     packages=['nyplcollections'],

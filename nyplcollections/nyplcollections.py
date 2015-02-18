@@ -1,16 +1,15 @@
 #!/usr/bin/env python
 
 import requests
-import xmltodict
 
 class NYPLsearch(object):
     raw_results = ''
     request = dict()
     error = None
 
-    def __init__(self, token, format=None, page=None, per_page=None):
+    def __init__(self, token, page=None, per_page=None):
         self.token = token
-        self.format = format or 'json'
+        self.format = 'json'
         self.page = page or 1
         self.per_page = per_page or 10
         self.base = "http://api.repo.nypl.org/api/v1/items"
@@ -60,10 +59,10 @@ class NYPLsearch(object):
                          headers=headers)
 
         self.raw_results = r.text
-        results = self._to_dict(r)['nyplAPI']['response']
 
         self.headers = results['headers']
         self.request = r.json()['nyplAPI'].get('request', dict())
+        results = r.json()['nyplAPI']['response']
 
         if self.headers['status'] == 'error':
             self.error = {
@@ -73,7 +72,4 @@ class NYPLsearch(object):
         else:
             self.error = None
 
-        return picker(results)
 
-    def _to_dict(self, r):
-        return r.json() if self.format == 'json' else xmltodict.parse(r.text)
