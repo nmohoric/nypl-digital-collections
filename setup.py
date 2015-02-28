@@ -10,5 +10,6 @@ setup(
         "requests"
     ],
     packages=['nyplcollections'],
-    long_description="""Really long text here."""
+    url="https://github.com/nmohoric/nypl-digital-collections",
+    download_url="https://github.com/nmohoric/nypl-digital-collections/tarball/v1.1"
 )
